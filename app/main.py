@@ -1,34 +1,25 @@
-'''
-Hare Krishna, Hare Krishna Krishna Krishna Hare Hare, Hare Rama Hare Rama Rama Rama Hare Hare
-Best Wishes from Shelly And Aayush
-'''
-
-from fastapi import FastAPI, UploadFile, File, HTTPException
-from pydantic import BaseModel
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from typing import Optional
 
 app = FastAPI()
 
 
-# Define a model for text input
-class TextInput(BaseModel):
-  text: Optional[str] = None  # Text Input is Optional
-
-
 @app.post("/process-input/")
-async def process_input(input: Optional[TextInput] = None,
-                        file: Optional[UploadFile] = File(None)):
-
-  # Case 1: No Input Provided:
-  if not input or not input.text and not file:
+async def process_input(
+    text: Optional[str] = Form(None),  # Accept text as form-data
+    file: Optional[UploadFile] = File(None)  # Accept file input
+):
+  # Case 1: No Input Provided
+  if not text and not file:
     raise HTTPException(
         status_code=400,
         detail="Please provide either text input, a file, or both.")
 
   result = {}
+
   # Case 2: Process text input if provided
-  if input and input.text:
-    result["text"] = f"Processed text: {input.text}"
+  if text:
+    result["text"] = f"Processed text: {text}"
 
   # Case 3: Process file input if provided
   if file:
